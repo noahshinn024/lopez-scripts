@@ -44,14 +44,6 @@ def extract_data_from_meci_logs(reactant_dir: str, product_dir: str, write_file:
         for path in Path(root_dir).rglob('*.log'):
             filenames += [path]
         return filenames
-        # for item in os.listdir(root_dir):
-            # fullpath = os.path.join(root_dir, item)
-            # if os.path.isdir(fullpath):
-                # for subitem in os.listdir(fullpath):
-                    # sub_fullpath = os.path.join(fullpath, subitem)
-                    # if os.path.isfile(sub_fullpath) and sub_fullpath.endswith('.log'):
-                        # filenames += [sub_fullpath]
-        # return filenames
 
     log_filepaths += get_log_filenames(reactant_dir)
     log_filepaths += get_log_filenames(product_dir)
@@ -73,7 +65,7 @@ def extract_data_from_meci_logs(reactant_dir: str, product_dir: str, write_file:
 
     with open(write_file, 'w') as f:
         json.dump(data, f)
-    print('successfully extracted data to `{write_file}`')
+    print(f'successfully extracted data to `{write_file}`')
     print(f'size: {os.path.getsize(write_file)}')
         
 def extract_data_from_file(data_file: str, natoms: int) -> NACData:
