@@ -11,6 +11,7 @@ import re
 import sys
 import json
 import warnings
+from pathlib import Path
 
 from typing import List, NamedTuple
 
@@ -40,21 +41,16 @@ def extract_data_from_meci_logs(reactant_dir: str, product_dir: str, write_file:
     
     def get_log_filenames(root_dir: str) -> List[str]:
         filenames = []
-        for item in os.listdir(root_dir):
-            fullpath = os.path.join(root_dir, item)
-            if os.path.isdir(fullpath):
-                for subitem in os.listdir(fullpath):
-                    sub_fullpath = os.path.join(fullpath, subitem)
-                    if os.path.isfile(sub_fullpath) and sub_fullpath.endswith('.log'):
-                        filenames += [sub_fullpath]
+        for path in Path(root_dir).rglob('*.log'):
+            filenames += [path]
         return filenames
-        # for _, subdirs, _ in os.walk(root_dir):
-            # for subdir in subdirs:
-                # dir_ = os.fsencode(os.path.join(root_dir, subdir))
-                # for file in os.listdir(dir_):
-                    # filename = os.fsdecode(file)
-                    # if filename.endswith('.log'):
-                        # filenames += [os.path.join(subdir, os.fsdecode(file))]
+        # for item in os.listdir(root_dir):
+            # fullpath = os.path.join(root_dir, item)
+            # if os.path.isdir(fullpath):
+                # for subitem in os.listdir(fullpath):
+                    # sub_fullpath = os.path.join(fullpath, subitem)
+                    # if os.path.isfile(sub_fullpath) and sub_fullpath.endswith('.log'):
+                        # filenames += [sub_fullpath]
         # return filenames
 
     log_filepaths += get_log_filenames(reactant_dir)
