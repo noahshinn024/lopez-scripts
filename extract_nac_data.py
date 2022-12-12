@@ -42,7 +42,7 @@ def extract_data_from_meci_logs(reactant_dir: str, product_dir: str, write_file:
         filenames = []
         for _, subdirs, _ in os.walk(root_dir):
             for subdir in subdirs:
-                dir_ = os.fsencode(subdir)
+                dir_ = os.fsencode(os.path.join(root_dir, subdir))
                 for file in os.listdir(dir_):
                     filename = os.fsdecode(file)
                     if filename.endswith('.log'):
