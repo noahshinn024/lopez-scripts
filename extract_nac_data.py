@@ -158,7 +158,7 @@ def extract_nacs(data, natoms):
             species += [single_molecule_atom_types]
             coords += [single_molecule_coords]
 
-            energy_difference = float(line.split('Energy difference: ')[1].replace('\n', ''))
+            energy_difference = float(data[i - 4].split('Energy difference: ')[1].replace('\n', ''))
             energy_differences += [energy_difference]
 
             match_number = re.compile(r'-?\ *[0-9]+\.?[0-9]*(?:[Ee]\ *-?\ *[0-9]+)?')
