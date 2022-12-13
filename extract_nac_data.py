@@ -76,9 +76,9 @@ def extract_data_from_file(data_file: str, natoms: int) -> NACData:
                 if 'Total derivative coupling' in line:
                     nac = []
                     for j in range(8, 8 + natoms):
-                        match_number = re.compile(r'-?\ *[0-9]+\.?[0-9]*(?:[Ee]\ *-?\ *[0-9]+)?')
-                        atom_nac = [float(x) for x in re.findall(match_number, raw_data[i+j])][1:]
+                        atom_nac = [float(x) for x in raw_data[i+j].split()[-3:]]
                         nac += [atom_nac]
+                    assert len(nac) == natoms and len(nac[0]) == 3, print(f'file: {data_file}\nnac: {nac}')
                     nacs += [nac]
 
                     coord_keyword_idx = get_last_instance_idx('Cartesian coordinates in Angstrom', raw_data)
@@ -100,10 +100,6 @@ def extract_data_from_file(data_file: str, natoms: int) -> NACData:
             warnings.warn(f'{data_file} is not valid')
             return [], [], [], [], [] # type: ignore
 
-    print(species)
-    print(coords)
-    print(energy_differences)
-    print(nacs)
     assert len(species) == len(coords) == len(energy_differences) == len(nacs)
     return NACData(species, coords, energy_differences, nacs)
 
