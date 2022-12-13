@@ -72,10 +72,10 @@ def extract_data_from_file(data_file: str, natoms: int) -> NACData:
     with open(data_file) as f:
         raw_data = f.readlines()
         if is_happy_landing(raw_data):
-            species, coords = extract_atom_types_and_coords(raw_data, natoms)
+            # species, coords = extract_atom_types_and_coords(raw_data, natoms)
             energy_differences = extract_energy_differences(raw_data)
             norms = extract_norms(raw_data)
-            nacs = extract_nacs(raw_data, natoms)
+            species, coords, nacs = extract_nacs(raw_data, natoms)
         else:
             warnings.warn(f'{data_file} is not valid')
             return [], [], [], [], [] # type: ignore
@@ -134,16 +134,30 @@ def extract_norms(data):
 # TODO: better way to do this
 def extract_nacs(data, natoms):
     nacs = []
+    species = []
+    coords = []
     for i, line in enumerate(data):
         if 'Total derivative coupling' in line:
             nac = []
             for j in range(8, natoms+8):
                 match_number = re.compile(r'-?\ *[0-9]+\.?[0-9]*(?:[Ee]\ *-?\ *[0-9]+)?')
                 atom_nac = [float(x) for x in re.findall(match_number, data[i+j])][1:]
-                nac.append(atom_nac)
-            nacs.append(nac)
+                nac += [atom_nac]
+            nacs += [nac]
 
-    return nacs
+            single_molecule_atom_types = []
+            single_molecule_coords = []
+            for j in range(-246, -246 + natoms):
+                split = data[i+j].split()
+                atom_type = split[1][0]
+                coord = [float(i) for i in split[2:]]
+                single_molecule_atom_types += [atom_type]
+                single_molecule_coords = [coord]
+            species += [single_molecule_atom_types]
+            coords += [single_molecule_coords]
+
+
+    return species, coords, nacs
 
 
 if __name__ == '__main__':
