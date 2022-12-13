@@ -80,6 +80,7 @@ def extract_data_from_file(data_file: str, natoms: int) -> NACData:
             warnings.warn(f'{data_file} is not valid')
             return [], [], [], [], [] # type: ignore
 
+    assert len(species) == len(coords) == len(energy_differences) == len(norms) == len(nacs)
     return NACData(species, coords, energy_differences, norms, nacs)
 
 def is_happy_landing(raw_data: List) -> bool:
