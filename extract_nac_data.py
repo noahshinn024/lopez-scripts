@@ -80,6 +80,11 @@ def extract_data_from_file(data_file: str, natoms: int) -> NACData:
             warnings.warn(f'{data_file} is not valid')
             return [], [], [], [], [] # type: ignore
 
+    print(len(species))
+    print(len(coords))
+    print(len(energy_differences))
+    print(len(norms))
+    print(len(nacs))
     assert len(species) == len(coords) == len(energy_differences) == len(norms) == len(nacs)
     return NACData(species, coords, energy_differences, norms, nacs)
 
