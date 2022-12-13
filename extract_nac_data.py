@@ -73,9 +73,9 @@ def extract_data_from_file(data_file: str, natoms: int) -> NACData:
         raw_data = f.readlines()
         if is_happy_landing(raw_data):
             # species, coords = extract_atom_types_and_coords(raw_data, natoms)
-            energy_differences = extract_energy_differences(raw_data)
-            norms = extract_norms(raw_data)
-            species, coords, nacs = extract_nacs(raw_data, natoms)
+            # energy_differences = extract_energy_differences(raw_data)
+            # norms = extract_norms(raw_data)
+            species, coords, nacs, energy_differences, norms, nacs = extract_nacs(raw_data, natoms)
         else:
             warnings.warn(f'{data_file} is not valid')
             return [], [], [], [], [] # type: ignore
@@ -133,13 +133,15 @@ def extract_norms(data):
 
 # TODO: better way to do this
 def extract_nacs(data, natoms):
-    nacs = []
     species = []
     coords = []
+    energy_differences = []
+    norms = []
+    nacs = []
     for i, line in enumerate(data):
         if 'Total derivative coupling' in line:
             nac = []
-            for j in range(8, natoms+8):
+            for j in range(8, 8 + natoms):
                 match_number = re.compile(r'-?\ *[0-9]+\.?[0-9]*(?:[Ee]\ *-?\ *[0-9]+)?')
                 atom_nac = [float(x) for x in re.findall(match_number, data[i+j])][1:]
                 nac += [atom_nac]
@@ -147,17 +149,23 @@ def extract_nacs(data, natoms):
 
             single_molecule_atom_types = []
             single_molecule_coords = []
-            for j in range(-246, -246 + natoms):
+            for j in range(-236, -236 + natoms):
                 split = data[i+j].split()
                 atom_type = split[1][0]
                 coord = [float(i) for i in split[2:]]
                 single_molecule_atom_types += [atom_type]
-                single_molecule_coords = [coord]
+                single_molecule_coords += [coord]
             species += [single_molecule_atom_types]
             coords += [single_molecule_coords]
 
+            energy_difference = float(line.split('Energy difference: ')[1].replace('\n', ''))
+            energy_differences += [energy_difference]
 
-    return species, coords, nacs
+            match_number = re.compile(r'-?\ *[0-9]+\.?[0-9]*(?:[Ee]\ *-?\ *[0-9]+)?')
+            norm = [float(x) for x in re.findall(match_number, data[i + 16])][0]
+            norms.append(norm)
+
+    return species, coords, nacs, energy_differences, norms, nacs
 
 
 if __name__ == '__main__':
